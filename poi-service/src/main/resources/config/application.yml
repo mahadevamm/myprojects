@@ -1,0 +1,22 @@
+logging:
+  level:
+    org.springframework.web: '${LOG_LEVEL:INFO}'
+    com.diksha.poi: '${LOG_LEVEL:INFO}'
+    
+spring:
+  application:
+    name: 'poi'
+server:
+  port: '${SERVER_PORT:9002}'
+  contextPath: '/poi'
+
+datasource:
+  diksha:
+    poi: 
+      driverClassName: '${DRIVER_CLASS:com.mysql.jdbc.Driver}'
+      url: '${JDBC_URL:jdbc:mysql://localhost:3306/profile1}'
+      username: '${DB_USER_NAME:root}'
+      password: '${DB_USER_PASSWORD:root}'
+       
+
+ 

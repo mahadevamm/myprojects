@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd       
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd 
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+       http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+       http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+	   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<context:annotation-config />
+	<context:component-scan base-package="com.diksha.poi">
+	</context:component-scan>
+
+	<bean id="poiDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="${datasource.diksha.poi.driverClassName}" />
+		<property name="jdbcUrl" value="${datasource.diksha.poi.url}" />
+		<property name="user" value="${datasource.diksha.poi.username}" />
+		<property name="password" value="${datasource.diksha.poi.password}" />
+	</bean>
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="poiDataSource" />
+		<property name="packagesToScan" value="com.diksha.poi.domain.model" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+			</props>
+		</property>
+		<property name="annotatedClasses">
+			<list>
+				<value>com.diksha.poi.domain.model.User</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="poiHibernateDao" class="com.diksha.poi.dao.impl.BaseHibernateDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="poiTransactionManager"
+		class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<tx:annotation-driven transaction-manager="poiTransactionManager" />
+
+	<bean id="cors-filter"
+		class="org.apache.cxf.rs.security.cors.CrossOriginResourceSharingFilter" />
+
+
+	<!-- validations and exception mapper classes -->
+
+	<bean id="exceptionMapper"
+		class="org.apache.cxf.jaxrs.validation.ValidationExceptionMapper" />
+	<bean id="validationProvider" class="org.apache.cxf.validation.BeanValidationProvider" />
+
+	<bean id="validationInInterceptor"
+		class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInInterceptor">
+		<property name="provider" ref="validationProvider" />
+	</bean>
+
+	<bean id="validationOutInterceptor"
+		class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationOutInterceptor">
+		<property name="provider" ref="validationProvider" />
+	</bean>
+	<bean id="corsFilter" class="com.diksha.poi.utility.CORSFilter" />
+
+
+</beans>
